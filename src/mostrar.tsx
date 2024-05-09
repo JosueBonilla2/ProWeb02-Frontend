@@ -8,7 +8,7 @@ function Mostrar(){
     return(
         <main>
             <Header title= "PELICULAS REGISTRADAS" />
-            <LogIn/>
+            <Prueba/>
         </main>
     )
 }
