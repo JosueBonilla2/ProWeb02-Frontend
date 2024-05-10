@@ -33,6 +33,7 @@ input[type="password"] {
 button {
     width: 100%;
     margin-top: 30px;
+    margin-bottom: 30px;
     padding: 10px;
     border: none;
     border-radius: 5px;
@@ -45,3 +46,27 @@ button {
 button:hover {
     background-color: #550000;
 }
+
+table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+th {
+    background-color: #f2f2f2;
+}
+
+tr:nth-child(even) {
+    background-color: #f2f2f2;
+}
+
+tr:hover {
+    background-color: #ddd;
+}
+

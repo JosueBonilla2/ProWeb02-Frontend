@@ -5,26 +5,49 @@ import Mostrar from "../../mostrar"
 
 const API_URL = "http://localhost:3000/"
 
-const loginData = {
-    email: "josue@gmail.com",
-    password: "12345"
-}
-
 function Form(){
 
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
-    const [showData, setShowData] = useState<boolean>(false)
-    const [loginAttempt, setLoginAttempt] = useState<boolean>(false)
-    const [isLoggedIn, setIsLoggedIn] = useState(false)
     const [user, setUser] = useState<any>(null)
+    const [categories, setCategory] = useState<Category[]>([])
 
+    interface Category {
+        id: string
+        titulo: string
+        genero: string
+        sinopsis: string
+    }
 
     useEffect(() => {
-        if(email.includes("chuy")){
-            alert("No registro gays")
+        const userInStorageString = window.localStorage.getItem("user")
+        if (userInStorageString) {
+            const userInStorage = JSON.parse(userInStorageString)
+            console.log(userInStorage)
+            setUser(userInStorage)
         }
-    }, [email, password])
+    }, [])
+    
+    const fetchCategory = async () => {
+        try{
+            const response = await fetch(`${API_URL}api/v1/categories/`,{
+                headers:{
+                    'Authorization' : `Bearer ${user.token}`
+                }
+            })
+
+            if(response.status === 200){
+                const data = await response.json()
+                console.log(data)
+                setCategory(data)
+            }else{
+                alert("Error")
+            }
+
+        }catch(error){
+            console.log(error)
+        }
+    }
 
     const handleInputChange = (stateUpdate: (newState: string)=>void ) =>{
         return (event: any) =>{
@@ -35,22 +58,6 @@ function Form(){
     const handleOnClick = () =>{
         
         logIn({email, password})
-
-        if(showData){
-            setEmail("")
-            setPassword("")
-            setLoginAttempt(false)
-            setIsLoggedIn(false)
-        } else {
-            setLoginAttempt(true)
-            if(email === loginData.email && password === loginData.password){
-                alert("¡Datos encontrados!")
-                setIsLoggedIn(true)
-            } else {
-                alert("¡Datos incorrectos! Por favor, intenta de nuevo.")
-            }
-        }
-        setShowData(!showData)
     }
 
     const logIn = async ({email, password}: {email: string, password: string}) => {
@@ -64,10 +71,11 @@ function Form(){
             })
             console.log(response)
 
-            if(response.status === 2000){
+            if(response.status === 200){
                 const data = await response.json()
                 setUser(data)
-                console.log(data)
+                window.localStorage.setItem("user", JSON.stringify(data))
+                alert("Usuario Encontrado!")
             }else{
                 alert("Usuario no encontrado")
             }
@@ -77,44 +85,64 @@ function Form(){
         } 
     }
 
-    if (isLoggedIn) {
-        return <Mostrar />
-    }
-
     return(
         <>
         {
-            user && (
+            user ? (
                 <section className="dataContainer">
-                    {
-                        showData && (
-                            <>
-                                <p>Correo: {user.user.email}</p>
-                                <p>Nombre: {user.user.name}</p>
-                                <p>Id: {user.user.id}</p>
-                            </>
-                        )
-                    }
+                    <>
+                        <p>Id: {user.user.id}</p>
+                        <p>Nombre: {user.user.name}</p>
+                        <p>Correo: {user.user.email}</p>
+                        
+                        <button onClick={fetchCategory}>
+                            Mostar Tabla
+                        </button>
+
+                        {
+                            categories && (
+                                <>
+                                    <table>
+                                        <thead>
+                                            <tr>
+                                                <th>Título</th>
+                                                <th>Género</th>
+                                                <th>Sinopsis</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {categories.map((category) => (
+                                                <tr key={category.id}>
+                                                    <td>{category.titulo}</td>
+                                                    <td>{category.genero}</td>
+                                                    <td>{category.sinopsis}</td>
+                                                </tr>
+                                            ))}
+                                        </tbody>
+                                    </table>
+                                </>
+                            )
+                        }
+                    </>
                 </section>
+            ) : (
+                <>
+                    <section className="formContainer">
+                        <span className="inputContainer">
+                            <label htmlFor="email">Correo:</label>
+                            <input type="email" id="email" name="email" value={email} onChange={handleInputChange(setEmail)}></input>
+                        </span>
+                        <span>
+                            <label htmlFor="password">Password:</label>
+                            <input type="password" id="password" name="password" value={password} onChange={handleInputChange(setPassword)}></input>
+                        </span>
+                        <button onClick={handleOnClick}>
+                            INICIAR SECION
+                        </button>
+                    </section>
+                </>
             )
         }
-            <Data email={email} password={password} showData={showData}/> 
-            <section className="formContainer">
-                <span className="inputContainer">
-                    <label htmlFor="email">Correo:</label>
-                    <input type="email" id="email" name="email" value={email} onChange={handleInputChange(setEmail)}></input>
-                </span>
-                <span>
-                    <label htmlFor="password">Password:</label>
-                    <input type="password" id="password" name="password" value={password} onChange={handleInputChange(setPassword)}></input>
-                </span>
-                <button onClick={handleOnClick}>
-                    {showData ? "Ocultar datos" : "INICIAR SECION"}
-                </button>
-                {loginAttempt && (email !== loginData.email || password !== loginData.password) && (
-                    <p style={{ color: 'red' }}>¡Datos incorrectos! Por favor, intenta de nuevo.</p>
-                )}
-            </section>
         </>       
     )
 }
