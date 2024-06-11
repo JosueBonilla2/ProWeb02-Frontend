@@ -7,7 +7,7 @@
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
     color: #fff;
-    text-align: center;
+    text-align: center
 }
 
 .inputContainer {
@@ -21,8 +21,9 @@ label {
 }
 
 input[type="email"],
-input[type="password"] {
-    width: calc(100% - 22px); /* Toma en cuenta el padding de 10px en cada lado */
+input[type="password"],
+input[type="text"] {
+    width: calc(100% - 22px);
     padding: 10px;
     border: none;
     border-radius: 5px;
@@ -47,26 +48,184 @@ button:hover {
     background-color: #550000;
 }
 
-table {
+.registerLink {
+    color: #007BFF;
+    cursor: pointer;
+}
+
+.registerLink:hover {
+    color: #0056b3;
+}
+
+.cardContainer {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.card {
+    background-color: #181212;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    margin: 10px;
+    width: 300px;
+    height: auto;
+    overflow: hidden;
+}
+
+.cardImage {
     width: 100%;
-    border-collapse: collapse;
+    height: 450px;
+    object-fit: cover;
 }
 
-th, td {
-    border: 1px solid #ddd;
-    padding: 8px;
-    text-align: left;
+.cardContent {
+    padding: 15px;
 }
 
-th {
-    background-color: #f2f2f2;
+.cardContent h3 {
+    margin: 0;
+    font-size: 1.5em;
+    color: #807326;
 }
 
-tr:nth-child(even) {
-    background-color: #f2f2f2;
+.cardContent p {
+    margin: 10px 0;
+    color: #ffffff;
 }
 
-tr:hover {
-    background-color: #ddd;
+.cardContent p strong {
+    color: #ffffff;
 }
 
+.cardContent button {
+    width: 100%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #007BFF;
+    color: #fff;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 50px;
+}
+
+.cardContent button:hover {
+    background-color: #0056b3;
+}
+
+.topRightButtons {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 10px;
+}
+
+.topRightButtons button {
+    width: 180px;
+    padding: 10px;
+    background-color: #000000;
+    color:#807326;
+    cursor: pointer;
+}
+
+.topRightButtons button:hover {
+    background-color: #35342f;
+}
+
+.registrationForm {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.inputContainer {
+    display: flex;
+    flex-direction: column;
+}
+
+.inputContainer input,
+.inputContainer textarea {
+    padding: 5px;
+    font-size: 1em;
+}
+
+button[type="submit"] {
+    padding: 10px;
+    cursor: pointer;
+}
+
+.registrationForm {
+    max-width: 400px;
+    margin: 0 auto;
+    padding: 20px;
+    background-color: #222;
+    margin-top: 30px;
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+    color: #fff;
+    text-align: center;
+}
+
+.registrationForm h2 {
+    margin-bottom: 20px;
+}
+
+.inputContainer {
+    margin-bottom: 20px;
+}
+
+.inputContainer label {
+    display: block;
+    margin-bottom: 5px;
+    color: #ccc;
+}
+
+.inputContainer input,
+.inputContainer textarea {
+    width: calc(100% - 22px);
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #333;
+    color: #fff;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+button[type="submit"] {
+    flex-basis: 48%;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #770000;
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+button[type="submit"]:hover {
+    background-color: #550000;
+}
+
+.userInfoContainer {
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+    flex: 1;
+}
+
+.userIcon {
+    margin-right: 10px;
+}
+
+.userInfo p {
+    margin: 0;
+    font-size: 12px;
+    font-weight: bold;
+    color: #000000;
+}

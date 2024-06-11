@@ -1,16 +1,18 @@
-import {useState, useEffect} from "react"
-import Data from "./Data"
+import { useState, useEffect } from "react"
 import "./Form.css"
-import Mostrar from "../../mostrar"
+import Header from "../Header"
+import RegistrationCategory from "./RegistrationCategory"
 
 const API_URL = "http://localhost:3000/"
 
-function Form(){
-
+function Form() {
     const [email, setEmail] = useState<string>("")
     const [password, setPassword] = useState<string>("")
     const [user, setUser] = useState<any>(null)
     const [categories, setCategory] = useState<Category[]>([])
+    const [viewed, setViewed] = useState<{ [key: string]: boolean }>({})
+    const [isRegistering, setIsRegistering] = useState<boolean>(false)
+    const [isAddingMovie, setIsAddingMovie] = useState<boolean>(false)
 
     interface Category {
         id: string
@@ -27,123 +29,151 @@ function Form(){
             setUser(userInStorage)
         }
     }, [])
-    
+
     const fetchCategory = async () => {
-        try{
-            const response = await fetch(`${API_URL}api/v1/categories/`,{
-                headers:{
-                    'Authorization' : `Bearer ${user.token}`
+        try {
+            const response = await fetch(`${API_URL}api/v1/categories/`, {
+                headers: {
+                    'Authorization': `Bearer ${user.token}`
                 }
             })
 
-            if(response.status === 200){
+            if (response.status === 200) {
                 const data = await response.json()
                 console.log(data)
                 setCategory(data)
-            }else{
+
+                const initialViewedState: { [key: string]: boolean } = {}
+                data.forEach((category: Category) => {
+                    initialViewedState[category.id] = false
+                })
+                setViewed(initialViewedState)
+            } else {
                 alert("Error")
             }
-
-        }catch(error){
+        } catch (error) {
             console.log(error)
         }
     }
 
-    const handleInputChange = (stateUpdate: (newState: string)=>void ) =>{
-        return (event: any) =>{
+    const handleInputChange = (stateUpdate: (newState: string) => void) => {
+        return (event: any) => {
             stateUpdate(event.target.value)
         }
     }
 
-    const handleOnClick = () =>{
-        
-        logIn({email, password})
+    const handleOnClick = () => {
+        logIn({ email, password })
     }
 
-    const logIn = async ({email, password}: {email: string, password: string}) => {
-        try{
-            const response = await fetch(`${API_URL}api/v1/auth/login`,{
+    const logIn = async ({ email, password }: { email: string, password: string }) => {
+        try {
+            const response = await fetch(`${API_URL}api/v1/auth/login`, {
                 method: 'POST',
                 headers: {
-                    "Content-Type" :"application/json",
+                    "Content-Type": "application/json",
                 },
-                body: JSON.stringify({email, password}),
+                body: JSON.stringify({ email, password }),
             })
             console.log(response)
 
-            if(response.status === 200){
+            if (response.status === 200) {
                 const data = await response.json()
                 setUser(data)
                 window.localStorage.setItem("user", JSON.stringify(data))
                 alert("Usuario Encontrado!")
-            }else{
+            } else {
                 alert("Usuario no encontrado")
             }
-
-        }catch(error) {
+        } catch (error) {
             console.error(error)
-        } 
+        }
     }
 
-    return(
-        <>
-        {
-            user ? (
-                <section className="dataContainer">
-                    <>
-                        <p>Id: {user.user.id}</p>
-                        <p>Nombre: {user.user.name}</p>
-                        <p>Correo: {user.user.email}</p>
-                        
-                        <button onClick={fetchCategory}>
-                            Mostar Tabla
-                        </button>
+    const toggleViewed = (id: string) => {
+        setViewed((prevViewed) => ({
+            ...prevViewed,
+            [id]: !prevViewed[id]
+        }))
+    }
 
-                        {
-                            categories && (
-                                <>
-                                    <table>
-                                        <thead>
-                                            <tr>
-                                                <th>Título</th>
-                                                <th>Género</th>
-                                                <th>Sinopsis</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            {categories.map((category) => (
-                                                <tr key={category.id}>
-                                                    <td>{category.titulo}</td>
-                                                    <td>{category.genero}</td>
-                                                    <td>{category.sinopsis}</td>
-                                                </tr>
-                                            ))}
-                                        </tbody>
-                                    </table>
-                                </>
-                            )
-                        }
-                    </>
+    const handleLogout = () => {
+        setUser(null)
+        window.localStorage.removeItem("user")
+    }
+
+    return (
+        <>
+            {user ? (
+                <section className="dataContainer">
+                    <div className="topRightButtons">
+                        <button onClick={() => setIsAddingMovie(!isAddingMovie)}>
+                            {isAddingMovie ? 'Cancelar Registro de Película' : 'Registrar Película'}
+                        </button>
+                        <button onClick={handleLogout}>Cerrar Sesión</button>
+                    </div>
+                    {isAddingMovie ? (
+                        <RegistrationCategory user={user} setIsAddingMovie={setIsAddingMovie} />
+                    ) : (
+                        <>
+                            <div className="userInfoContainer">
+                                <div className="userIcon">
+                                    <img src="/img/user-icon.png" alt="User Icon" />
+                                </div>
+                                <div className="userInfo">
+                                    <p>Hola, {user.user.name}</p>
+                                    <p>Email: {user.user.email}</p>
+                                </div>
+                            </div>
+                            
+                            <button onClick={fetchCategory}>
+                                Mostrar Tarjetas
+                            </button>
+
+                            {categories && (
+                                <div className="cardContainer">
+                                    {categories.map((category) => (
+                                        <div className="card" key={category.id}>
+                                            <img src={`/img/${category.titulo}.jpg`} alt={category.titulo} className="cardImage" />
+                                            <div className="cardContent">
+                                                <h3>{category.titulo}</h3>
+                                                <p><strong>Género:</strong> {category.genero}</p>
+                                                <p><strong>Sinopsis:</strong> {category.sinopsis}</p>
+                                                <button onClick={() => toggleViewed(category.titulo)}>
+                                                    {viewed[category.titulo] ? 'Ya la vi' : 'No la he visto'}
+                                                </button>
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            )}
+                        </>
+                    )}
                 </section>
             ) : (
                 <>
-                    <section className="formContainer">
-                        <span className="inputContainer">
-                            <label htmlFor="email">Correo:</label>
-                            <input type="email" id="email" name="email" value={email} onChange={handleInputChange(setEmail)}></input>
-                        </span>
-                        <span>
-                            <label htmlFor="password">Password:</label>
-                            <input type="password" id="password" name="password" value={password} onChange={handleInputChange(setPassword)}></input>
-                        </span>
-                        <button onClick={handleOnClick}>
-                            INICIAR SECION
-                        </button>
-                    </section>
+                    <Header title="FORMULARIO LOGIN" />
+                    {isRegistering ? (
+                       <RegistrationCategory user={user} setIsAddingMovie={setIsAddingMovie} />
+                    ) : (
+                        <section className="formContainer">
+                            <span className="inputContainer">
+                                <label htmlFor="email">Correo:</label>
+                                <input type="email" id="email" name="email" value={email} onChange={handleInputChange(setEmail)} />
+                            </span>
+                            <span>
+                                <label htmlFor="password">Password:</label>
+                                <input type="password" id="password" name="password" value={password} onChange={handleInputChange(setPassword)} />
+                            </span>
+                            <button onClick={handleOnClick}>
+                                INICIAR SESION
+                            </button>
+                            <p className="registerLink" onClick={() => setIsRegistering(true)}>No tienes cuenta? Regístrate</p>
+                        </section>
+                    )}
                 </>
-            )
-        }
-        </>       
+            )}
+        </>
     )
 }
 
